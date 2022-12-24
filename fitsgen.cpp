@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
+#include "mathutils.hpp"
 using namespace std;
 
 //these values are relative to image dimensions
@@ -51,10 +52,9 @@ void generate_starfield(int *data_array, int *star_loc_list, int nrows, int ncol
 
 
 
-void write_fits_data(int *data_array, int nrows, int ncols, string outfilepath){
+void write_image_data(int *data_array, int nrows, int ncols, string outfilepath){
 	ofstream outfile;
 	outfile.open(outfilepath, ios::binary);
-	cout << nrows << " "  << ncols << endl;
 	for (int i = 0; i < nrows; i++){
 		for (int j = 0; j < ncols; j++){
 			outfile.write(reinterpret_cast<const char *>(&data_array[i * ncols + j]), sizeof(int));
@@ -83,17 +83,23 @@ void supernova_sequence(char* directory){
 	int arr[imgsize * imgsize];
 	generate_starfield(arr, star_loc_list, imgsize, imgsize, 20);
 
+	int target_radius = MIN_STAR_RAD * nrows;
+	int target_x = rand() % (ncols - target_radius * 2) + target_radius;
+	int target_y = rand() % (nrows - target_radius * 2) + target_radius;
+	int max_lum_add = 9 * target_radius * target_radius;
+
 	for (int img_num = 0; img_num < 100; img_num++){
-		overlay_star(arr, 500, 500, 5, imgsize, imgsize, img_num);
+		overlay_star(arr, target_x, target_y, 10, imgsize, imgsize, supernova_light_curve(0, 100, img_num, max_lum_add));
 		string fname = directory;
 		fname = fname + "/data" + to_string(img_num) + ".txt";
-		cout << fname << endl;
-		write_fits_data(arr, imgsize, imgsize, fname);
+		write_image_data(arr, imgsize, imgsize, fname);
 	}
 }
 
 int main(int argc, char **argv){
 	srand(time(NULL));
+
+	define_light_curves();
 
 	cout << "Running FITS generation sequence..." << endl;
 	cout << "Sequence type " << argv[1] << endl;

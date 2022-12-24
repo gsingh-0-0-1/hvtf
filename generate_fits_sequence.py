@@ -4,7 +4,6 @@ import sys
 import os
 import subprocess
 import datetime
-import matplotlib.pyplot as plt
 
 C_TO_COMPILE = ['fitsgen.cpp']
 
@@ -14,9 +13,12 @@ for f in C_TO_COMPILE:
 
 ARGS = sys.argv
 
-OPTION = ARGS[1]
-
-OUTDIR = ARGS[2]
+try:
+	OPTION = ARGS[1]
+	OUTDIR = ARGS[2]
+except Exception:
+	OPTION = "SN"
+	OUTDIR = "sample_sn"
 
 subprocess.run(['rm', '-rf', OUTDIR])
 os.makedirs(OUTDIR)
@@ -33,7 +35,3 @@ for i in range(100):
 	hdu = fits.PrimaryHDU(data)
 	hdul = fits.HDUList([hdu])
 	hdul.writeto(OUTDIR + "/" + str(i) + ".fits")
-
-	plt.imshow(data)
-	plt.pause(0.01)
-	plt.clf()

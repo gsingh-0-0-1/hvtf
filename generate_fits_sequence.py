@@ -4,6 +4,7 @@ import sys
 import os
 import subprocess
 import datetime
+from tqdm import tqdm
 
 C_TO_COMPILE = ['fitsgen.cpp']
 
@@ -23,9 +24,11 @@ except Exception:
 subprocess.run(['rm', '-rf', OUTDIR])
 os.makedirs(OUTDIR)
 
-subprocess.run(['./fitsgen', OPTION, OUTDIR + "/data.txt"])
+subprocess.run(['./fitsgen', OPTION, OUTDIR])
 
-for i in range(100):
+print("Rewriting data as fits...")
+
+for i in tqdm(range(100)):
 
 	data = np.fromfile(OUTDIR + "/data" + str(i) + ".txt", dtype = np.uint32)
 

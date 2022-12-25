@@ -8,8 +8,14 @@
 using namespace std;
 
 //these values are relative to image dimensions
-const double MIN_STAR_RAD = 0.01;
-const double MAX_STAR_RAD = 0.03;
+const double MIN_STAR_RAD = 0.002;
+const double MAX_STAR_RAD = 0.008;
+
+void arrcp(int *arr1, int *arr2, int n){
+	for (int i = 0; i < n; i++){
+		arr2[i] = arr1[i];
+	}
+}
 
 //format is [x, y, radius]
 void generate_body_info_list(int *data_array, int nbodies, int ncols, int nrows, int minrad, int maxrad){
@@ -27,7 +33,7 @@ void overlay_star(int *data_array, int cx, int cy, int radius, int nrows, int nc
 		for (int star_y = -radius; star_y <= radius; star_y++){
 			int d2 = star_x * star_x + star_y * star_y;
 			if (d2 <= radius * radius){
-				data_array[(star_y + cy) * ncols + (cx + star_x)] = radius * radius - d2 + lum_add;
+				data_array[(star_y + cy) * ncols + (cx + star_x)] += radius * radius - d2 + lum_add;
 			}
 		}
 	}
@@ -64,7 +70,7 @@ void write_image_data(int *data_array, int nrows, int ncols, string outfilepath)
 }
 
 void supernova_sequence(char* directory){
-	int nstars = 20;
+	int nstars = 100;
 
 	int imgsize = 1000;
 
@@ -81,19 +87,32 @@ void supernova_sequence(char* directory){
 	generate_body_info_list(star_loc_list, nstars, nrows, ncols, minrad, maxrad);
 
 	int arr[imgsize * imgsize];
-	generate_starfield(arr, star_loc_list, imgsize, imgsize, 20);
+	generate_starfield(arr, star_loc_list, imgsize, imgsize, nstars);
 
 	int target_radius = MIN_STAR_RAD * nrows;
 	int target_x = rand() % (ncols - target_radius * 2) + target_radius;
 	int target_y = rand() % (nrows - target_radius * 2) + target_radius;
 	int max_lum_add = 9 * target_radius * target_radius;
 
-	for (int img_num = 0; img_num < 100; img_num++){
-		overlay_star(arr, target_x, target_y, 10, imgsize, imgsize, supernova_light_curve(0, 100, img_num, max_lum_add));
+	int N_IMGS = 100;
+
+	cout << endl;
+
+	for (int img_num = 0; img_num < N_IMGS; img_num++){
+		int lum_add = supernova_light_curve(0, N_IMGS, img_num, max_lum_add);
+
+		int newarr[imgsize * imgsize];
+		arrcp(arr, newarr, imgsize * imgsize);
+
+		overlay_star(newarr, target_x, target_y, (int)pow(lum_add, 0.5), imgsize, imgsize, lum_add);
+
 		string fname = directory;
 		fname = fname + "/data" + to_string(img_num) + ".txt";
-		write_image_data(arr, imgsize, imgsize, fname);
+		write_image_data(newarr, imgsize, imgsize, fname);
+
+		cout << "\rWriting data for image " << img_num + 1 << " / " << N_IMGS << "..." << flush;
 	}
+	cout << endl;
 }
 
 int main(int argc, char **argv){
@@ -103,9 +122,9 @@ int main(int argc, char **argv){
 
 	cout << "Running FITS generation sequence..." << endl;
 	cout << "Sequence type " << argv[1] << endl;
-	cout << "Target file is " << argv[2] << endl;
+	cout << "Target directory is " << argv[2] << endl;
 
-	supernova_sequence("./sample_sn");
+	supernova_sequence(argv[2]);
 
 	return 0;
 }

@@ -8,8 +8,8 @@
 using namespace std;
 
 //these values are relative to image dimensions
-const double MIN_STAR_RAD = 0.002;
-const double MAX_STAR_RAD = 0.008;
+const double MIN_STAR_RAD = 0.001;
+const double MAX_STAR_RAD = 0.005;
 
 void arrcp(int *arr1, int *arr2, int n){
 	for (int i = 0; i < n; i++){

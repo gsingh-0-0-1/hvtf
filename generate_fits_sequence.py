@@ -28,7 +28,9 @@ subprocess.run(['./fitsgen', OPTION, OUTDIR])
 
 print("Rewriting data as fits...")
 
-for i in tqdm(range(100)):
+NFITS = len([el for el in os.listdir(OUTDIR) if 'fits' in el])
+
+for i in tqdm(range(NFITS)):
 
 	data = np.fromfile(OUTDIR + "/data" + str(i) + ".txt", dtype = np.uint32)
 

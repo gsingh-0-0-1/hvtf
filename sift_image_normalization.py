@@ -13,7 +13,7 @@ def normalize(img_dat, header_dat):
     try:
         maxval = header_dat['DATAMAX']
         minval = header_dat['DATAMIN']
-    except KeyError:
+    except KeyError:#for when datamax/datamin don't exist
         return
     result = data_scale(img_dat, minval, maxval)
     #convert to jpg
@@ -37,7 +37,9 @@ for file in fits_files:
     #result_image_data.append(normalize(image_data, header))
     image_name = os.path.basename(file).replace('.fits', '.jpg')
     try:
-        normalize(image_data, header).save(image_name)
+        if not os.path.exists("training"):
+            os.makedirs("training")
+        normalize(image_data, header).save("training/"+image_name)
     except:
         continue
     plt.imshow(image_data)

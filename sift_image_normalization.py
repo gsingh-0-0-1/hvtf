@@ -2,10 +2,24 @@ from astropy.io import fits
 import numpy as np
 import matplotlib.pyplot as plt
 import os
+from PIL import Image
+import sys
+
+def data_scale(img_dat, minval, maxval):
+    #scale data to [0,1] range
+    return (img_dat - minval)/(maxval - minval)
 
 def normalize(img_dat, header_dat):
-    result = np.array()
-    return result
+    try:
+        maxval = header_dat['DATAMAX']
+        minval = header_dat['DATAMIN']
+    except KeyError:
+        return
+    result = data_scale(img_dat, minval, maxval)
+    #convert to jpg
+    image_data = (255*result).astype(np.uint8)[::-1,:]
+    image = Image.fromarray(image_data, 'L')
+    return image
 
 #find all .fits files
 fits_files = []
@@ -14,12 +28,17 @@ for root, dirs, files in os.walk(os.getcwd()):
         if file.endswith(".fits"):
              fits_files.append(os.path.join(root, file))
 
-result_image_data = np.array()
+result_image_data = []
 
 #iterate through files and normalize
 for file in fits_files:
     header = fits.getheader(file)
     image_data = fits.getdata(file)
-    result_image_data.append(normalize(image_data, header))
+    #result_image_data.append(normalize(image_data, header))
+    image_name = os.path.basename(file).replace('.fits', '.jpg')
+    try:
+        normalize(image_data, header).save(image_name)
+    except:
+        continue
     plt.imshow(image_data)
     plt.show()

@@ -12,7 +12,7 @@ def get_ztf_data(ra, dec, radius, start_date):
     #end_mjd = Time(end_date, format='iso').mjd
 
     zquery.load_metadata(radec=[ra,dec], size=radius, sql_query=f"fid=3 and obsjd>{start_mjd}")
-    zquery.download_data("sciimgdaopsfcent.fits", show_progress=True, nprocess=1, verbose=True, overwrite=False)
+    zquery.download_data("scimrefdiffimg.fits.fz", show_progress=True, nprocess=1, verbose=True, overwrite=False)
 
 def get_tess_data(ra, dec, radius, start_date):
     #lightkurve.search_lightcurve(

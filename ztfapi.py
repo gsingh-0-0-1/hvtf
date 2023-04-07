@@ -12,7 +12,7 @@ def get_ztf_data(ra, dec, radius, start_date):
     #end_mjd = Time(end_date, format='iso').mjd
 
     zquery.load_metadata(radec=[ra,dec], size=radius, sql_query=f"fid=3 and obsjd>{start_mjd}")
-    zquery.download_data("scimrefdiffimg.fits.fz", show_progress=True, nprocess=1, verbose=True, overwrite=False)
+    zquery.download_data("sciimg.fits", show_progress=True, nprocess=1, verbose=True, overwrite=False)
 
 def get_tess_data(ra, dec, radius, start_date):
     #lightkurve.search_lightcurve(
@@ -26,7 +26,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Retrieve ZTF objects within a certain area and time range.')
     parser.add_argument('--ra', type=float, required=True, help='Right ascension of center of search area.')
     parser.add_argument('--dec', type=float, required=True, help='Declination of center of search area.')
-    parser.add_argument('--radius', type=float, required=True, help='Radius of search area in arcminutes.')
+    parser.add_argument('--radius', type=float, required=True, help='Radius of search area in degrees.')
     parser.add_argument('--database', type=str, required=True, help='Database to search. Options: ztf, tess.')
     parser.add_argument('--start_date', type=str, required=True, help='Start date of search in format YYYY-MM-DD.')
     args = parser.parse_args()

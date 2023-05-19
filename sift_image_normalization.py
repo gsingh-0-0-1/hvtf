@@ -40,8 +40,8 @@ for file in fits_files:
     except TypeError:
         continue
     #result_image_data.append(normalize(image_data, header))
-    plt.imshow(image_data)
-    plt.show()
+    #plt.imshow(image_data)
+    #plt.show()
     image_name = os.path.basename(file).replace('.fits', '.jpg')
     #try:
     if not os.path.exists("training"):
